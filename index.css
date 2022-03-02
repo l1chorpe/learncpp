@@ -61,17 +61,39 @@ section > h4
     padding-left: 2vw;
 }
 
-div.flex-container
+/* FOR MOBILES */
+@media screen and ((orientation: portrait) and (max-width: 1000px)), 
+                  ((orientation: landscape) and (max-height: 1000px))
 {
-    align-items: center;
-    display: flex;
-    gap: 1.5em;
+    div.flex-container
+    {
+        display: flex;
+        flex-direction: column;
+    }
+
+    div.flex-container > article.flex-article
+    {
+        flex-basis: 100%;
+    }
 }
 
-div.flex-container > article.flex-article
+/* FOR COMPUTERS */
+@media screen and ((orientation: portrait) and (min-height: 1000px)),
+                  ((orientation: landscape) and (min-height: 1000px))
 {
-    flex-basis: 50%;
+    div.flex-container
+    {
+        align-items: center;
+        display: flex;
+        gap: 1.5em;
+    }
+
+    div.flex-container > article.flex-article
+    {
+        flex-basis: 50%;
+    }
 }
+
 
 ul
 {
