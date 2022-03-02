@@ -78,7 +78,7 @@ section > h4
 }
 
 /* FOR COMPUTERS */
-@media screen and ((orientation: portrait) and (min-height: 1000px)),
+@media screen and ((orientation: portrait) and (min-width: 1000px)),
                   ((orientation: landscape) and (min-height: 1000px))
 {
     div.flex-container
