@@ -1,0 +1,99 @@
+@font-face {
+    font-family: FiraCode;
+    src: url(resources/FiraCode.ttf);
+}
+
+:root
+{
+    font-family: Segoe UI, Helvetica;
+    --bg-color: #282828;
+    --txt-color: #d6d6d6;
+}
+
+html, body
+{
+    background-color: var(--bg-color);
+    color: var(--txt-color);
+    margin: 0;
+    overflow-x: hidden;
+    padding: 0 0 2rem 0;
+    width: 100vw;
+}
+
+pre > code
+{
+    font-family: FiraCode;
+    font-size: small;
+}
+
+
+
+
+#title
+{
+    text-align: center;
+}
+
+section
+{
+    margin-top: 5rem;
+    padding-left: 2vw;
+    padding-right: 2vw;
+}
+
+section > p
+{
+    padding-left: 2vw;
+}
+
+section > pre
+{
+    padding-left: 2vw;
+}
+
+section > h2
+{
+    text-decoration: underline;
+}
+
+section > h4
+{
+    padding-left: 2vw;
+}
+
+div.flex-container
+{
+    align-items: center;
+    display: flex;
+    gap: 1.5em;
+}
+
+div.flex-container > article.flex-article
+{
+    flex-basis: 50%;
+}
+
+ul
+{
+    margin-left: 2vw;
+}
+
+.flex-table
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row
+{
+    display: flex;
+    flex-basis: 100%;
+}
+
+.flex-cell
+{
+    border: 1px solid var(--txt-color);
+    flex-basis: calc(1/9 * 100%);
+    line-height: 1.4em;
+    text-align: center;
+}

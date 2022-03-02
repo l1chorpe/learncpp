@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="resources/material-darker.min.css">
+        <script src="resources/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
+
+        <title>Learn C++!</title>
+    </head>
+
+    <body>
+        <h1 id="title">C++ Full Course (more or less)</h1>
+
+        <section>
+            <h2>Overview</h2>
+            <p>
+                C++ is <u>statically typed</u>. Meaning that each variable can accept <u>only one</u> type of data
+                during its whole lifecycle. If the variable <var>integer</var> contains an integer, then it will only be
+                able to contain an integer. It's also an object oriented language, which allows us to create so-called
+                objects, which is a very useful concept that you'll be able to use... eventually.
+            </p>
+            <p>
+                Every C++ program starts with the main function. No main function = no program. This function has two
+                overloads. The simplest one has no arguments.
+            </p>
+<pre><code class="language-cpp">int main()
+{
+    // code
+}
+</code></pre>
+            <p>
+                The other one has two arguments. They're useful when dealing with command line arguments, such as the
+                name of a file when compiling with g++ or clang++.
+            </p>
+<pre><code class="language-cpp">int main(int argc, char *argv[])
+{
+    // code
+}
+</code></pre>
+            <p>
+                <var>argc</var> is the argument count. The script itself counts as an argument so it's always greater
+                than zero. <var>argv</var> is an array of char pointers, so an array of C-style strings, which hold the
+                name of the script itself and the arguments.
+            </p>
+            <p>
+                Traditionally, <code>return 0;</code> was mandatory at the end of the main function. Nowadays, the
+                compiler will very, <i>very</i> probably add it if you forget it or just don't wanna add it. You'll have
+                less risks of getting insulted if you add it.
+            </p>
+        </section>
+        <section>
+            <h2>Bad practices...</h2>
+            <h3>using namespace std;</h3>
+            <p>
+                This imports in the current context <i>everything</i> that is declared in the standard library and
+                included in the file. It's the equivalent of asking someone to bring the whole store when you only need
+                a screwdriver, a hammer and a saw...
+            </p>
+            <p>
+                Instead, rewrite this using directive to only import what you want, for example <code>using
+                std::cout;</code>
+                <br>
+                Another problem is that different namespace might have an identical function. Since it's easy to forget
+                about namespaces when including std, or when reading someone else's code, which function is really used
+                isn't apparent. Is it <code>std::vector</code> or <code>MyMoreOptimized::vector</code>?
+            </p>
+            <p>
+                Don't overuse this directive though. If you use <code>std::cout</code> once in a file, maybe it's not
+                necessary to import it.
+            </p>
+
+            <h3>Using raw pointers</h3>
+            <p>
+                Pointers are fancy. They look cool, they sound cool, and you probably look cool using them as well. But
+                welcome a well deserved memory leak if you forget to delete it. In a lot of cases, using pointers at all
+                can be avoided. And if you really need them, consider using smart pointers. They were introduced in
+                C++11 so use them.
+            </p>
+
+            <h3>Using C-style strings</h3>
+            <p>
+                <em>Avoid them whenever you can</em>. Use <code>std::string</code>. You're coding in C++, not C. If you
+                must use char arrays, don't forget to include <code>&lt;cstring&gt;</code> so you can use
+                <code>std::strcmp</code> to compare two C-style strings.
+            </p>
+
+            <h3>Using C-style arrays</h3>
+            <p>
+                Again, you're coding in C++, not C. C-style arrays have a tendency to decay into pointers, which
+                definitely <i>sucks ass</i>. If you have to use fixed-length arrays, include <code>&lt;array&gt;</code>
+                and use
+                <code>std::array</code>. If you need dynamic-length arrays, they're called vectors in C++. Include
+                <code>&lt;vector&gt;</code> and use <code>std::vector</code>.
+            </p>
+
+            <h3>Implicit or C-style casting when not appropriate</h3>
+            <p>
+                Do you need to cast objects or pointers? Use <code>std::static_cast</code>.<br>
+                Do you need to cast primitive types? The new type can hold the max value from the old type, and if the
+                types are compatible, you can cast implicitly. Otherwise, use <code>std::static_cast</code>.
+<pre><code class="language-cpp">class Base
+{
+    // code
+};
+
+class Derived : public Base
+{
+    // code
+};
+
+int main()
+{
+    Derived derived{};
+    // Base base = (Base) derived; // This is C-style casting, not good for objects
+    Base base = std::static_cast&lt;Base&gt;(derived); // This works well
+
+    int first = 12;
+    float second = first; // Implicit cast; it works because floats can contain ints
+
+    double third = 3.14159;
+    // int fourth = third; // Undefined behavior; unsafe
+
+    int fifth = 69420;
+    // char sixth = fifth; // Undefined behavior Again
+
+    unsigned short seventh = 1200;
+    int eighth = seventh; // Implicit cast; it works because short is smaller than int
+                          // and unsigned is used on the old type
+}
+</code></pre>
+            </p>
+        </section>
+        <section>
+            <h2>Good practices!</h2>
+            <h3>Use <code>const</code> whenever you can</h3>
+            <p>
+                Don't be afraid to overuse it: you can't! If it is a constant, put the name in all caps; if it is not
+                but technically stays constant throughout the block in which it is, write it normally but put
+                <code>const</code> in front of it. Have a member function that doesn't modify the object's values? Mark
+                it as <code>const</code>! Anything that can be const should be const. It allows the compiler to optimize
+                your program a little more and helps you track stupid mistakes. If you know what you're doing...
+            </p>
+
+            <h3>Make small functions</h3>
+            <p>
+                Instead of cramming everything into the main function, divide your code and give a little job to each of
+                them. This makes it easier to read and debug.
+            </p>
+
+            <h3>Comment your code</h3>
+            <p>
+                Unless you make a file where the code is entirely self-explanatory and contains less than ten lines, you
+                better comment what you do. Don't comment everything but be sure that what can't be understood in a
+                single glance, can be understood by reading the comment next to it. You'll thank me when you read your
+                code one or two weeks after not programming at all.
+            </p>
+        </section>
+        <section>
+            <h2>Variables</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Variables are the building blocks of a good program. Unless your job is to obfuscate it but if you're
+                        reading this, that's not your job. Variables make your code readable to others, and to yourself after
+                        you decide to pick up your project where you left it weeks or months ago. <br>
+                        Using a variable implies two steps: a declaration and an initialization. A declaration is written as
+                        follows: <code>type name;</code><br>
+                        How a variable is initalized depends on its type.
+                    </p>
+                    <p>
+                        In C++, there are various <u>primitive</u> types. <br>
+                        <ul>
+                            <li><code>bool</code>: accepts <code>true</code> or <code>false</code> as values.</li>
+                            <li><code>char</code>: accepts values from -128 to 127 signed, and 0 to 255 unsigned.</li>
+                            <li><code>short</code>: accepts values from -2<sup>8</sup> to 2<sup>8</sup>-1 signed, and 0 to
+                            2<sup>16</sup> unsigned.</li>
+                            <li><code>int</code>: accepts values from -2<sup>8</sup> to 2<sup>8</sup>-1 signed, and 0 to
+                            2<sup>16</sup> unsigned.</li>
+                            <li><code>long</code>: accepts values from -2<sup>16</sup> to 2<sup>16</sup>-1 signed, and 0 to
+                            2<sup>32</sup> unsigned.</li>
+                            <li><code>long long</code>: accepts values from -2<sup>32</sup> to 2<sup>32</sup> signed, and 0 to
+                            2<sup>64</sup> unsigned.</li>
+                        </ul>
+                    </p>
+                    <p>
+                        There are also floating point types, namely <code>float</code>, <code>double</code> and <code>long
+                        double</code> but they work in weird ways since they represent floating point numbers using integer
+                        types.
+                    </p>
+                    <p>
+                        
+                    </p>
+                </article>
+                <article class="flex-article">
+    <pre><code class="language-cpp">int main()
+    {
+        int integer; // declaration
+        integer = 0; // initialization
+
+        float floater = .5; // declaration and initialization
+    }
+    </code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Strings</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Strings are weird in C++. First, they're not a primitive type. Although, if you ask the compiler
+                        to automatically deduce the type of a string literal, like this: <code>auto s =
+                        "Hey!";</code><br>
+                        The compiler will consider <code>s</code> as <code>const char *s</code>. What? Why? The hell is
+                        this? How am I even supposed to read it? We'll see that later but for now, if you know what
+                        <code>auto</code> is, just don't use it on string literals. So instead of what's written above,
+                        write:
+                        <code>std::string s = "Hey!";</code><br>
+                        By the way, without knowing it, <code>std::string</code> is the first object you used. Don't try
+                        to think about what it is, just trust me.
+                    </p>
+                    <p>
+                        Since I know that you might not listen to me, I'll make sure you do. Let's say you have two
+                        C-style strings (that's what <code>const char *</code> are called). How do you put one next to
+                        the other? <code>std::cout << one + two;</code><br>
+                        Yeah, no, won't work. Try it if you don't believe me. <code>std::cout << one <<
+                        two;</code><br>
+                        Okay, clever. Now what if you have to put it in another variable instead of sending it to the
+                        standard output? No, using a plus sign won't work. Actually, on the right is the actual way of
+                        concatenating (that's how it's called) two C-style strings. Notice you have to include another
+                        header as well. When you use two string, it's way easier though. You can just use the plus
+                        sign...
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">#include &lt;cstring&gt;
+#include &lt;string&gt;
+
+using std::strlen;
+
+int main()
+{
+    // C-style
+    auto one = "One!", two = "Two!";
+    char onetwo[strlen(one) + strlen(two) + 1];
+    std::strcpy(onetwo, one);
+    std::strcat(onetwo, two);
+
+    // C++ string
+    std::string one_s = "One!", two_s = "Two!", three_s;
+    three_s = one_s + two_s;
+
+    // Or in one line...
+    std::string one = "One!", two = "Two!", three = one + two;
+}
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Operators</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Obviously, just having variables isn't enough, we need to be able to interact with them. For
+                        that, there are multiple <u>operators</u>. Here are the basic ones:
+                        <ul>
+                            <li><code>=</code></li>: assigns the right value to the left variable
+                            <li><code>+</code>: adds two items.</li>
+                            <li><code>-</code>: subtracts two items.</li>
+                            <li><code>*</code>: multiplies two items.</li>
+                            <li><code>/</code>: divides two elements<sup>1</sup>.</li>
+                            <li><code>%</code>: gives the rest of the integer division of the left operand by the right
+                            operand.</li>
+                        </ul>
+                        These behave like in math and even respect priority of operation. If you wanna give priority to
+                        another operation, it works just like in math: put parenthesis where you need to. There is a
+                        subtle catch with divisions though... <sup>1</sup>If both the left and right operands are
+                        integers, it performs an integer division. If at least one of them is a float or a double, then
+                        it performs a "regular" division.
+                    </p>
+                    <p>
+                        There are also increment and decrement operators, that add and subtract 1 from the operand
+                        they're attached to: <code>++</code> and <code>--</code>. Although you can't use these ones on
+                        raw numbers (meaning you can't write <code>++2</code>); they can only be used on primitive-type
+                        variables that have been <u>initalized</u>.
+                    </p>
+                    <p>
+                        If you want to do more complex operations, like taking the cosine of the 5th root of e to the
+                        power of 420.69, you'll have to include <code>&lt;cmath&gt;</code> and access them like so:
+                        <code>std::function</code>.
+                    </p>
+                    <p>
+                        Still belonging in the realm of mathematics, there are logical operators:
+                        <ul>
+                            <li><code>|</code>: performs a bitwise OR operation.</li>
+                            <li><code>&</code>: performs a bitwise AND operation.</li>
+                            <li><code>^</code>: performs a bitwise XOR operation.</li>
+                            <li><code><<</code>: shifts the bits to the left.</li>
+                            <li><code>>></code>: shifts the bits to the right.</li>
+                            <li><code>~</code>: inverts all the bits.</li>
+                        </ul>
+                        It's important to note that when using those operations along with numbers, they're often
+                        written using either their hexadecimal or binary form, rather than decimal. Regardless, the
+                        program interprets all primitive integer types as binary numbers. To write a hexadecimal number,
+                        simply prefix it with "0x" (as in 0x6f), and "0b" for binary.<br>
+                        <u>Important note</u>: binary literals (that's how we actually call numbers like "0b1001") are
+                        only supported since C++14! Oh and obviously, you can only use those operators on primitive
+                        integer types.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">// common mathematical operators
+
+int two_plus_three_minus_one = 2 + 3 - 1;
+double twopi = 2 * 3.14159;
+int nonsense = 5 / 2 + 7 % 4;
+int not_equal_to_nonsense = 5 / (2 + 7) % 4;
+
+// less common mathematical operators
+
+int orop = 32 | 10; // orop = 42
+int andop = 0xa0 & 0x2a; // andop = 0x20 = 32
+int xorop = 0b1001 ^ 0b0101; // xorop = 0b1100 = 12
+char leftshift = 0b1 << 2; // leftshift = 0b100 = 4
+char rightshift = 0b1011 >> 3; //rightshift = 0b1 = 1
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Operators (the end)</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Then there are more complex operators that typically aren't found in math, like comparison
+                        operators:
+                        <ul>
+                            <li><code>&lt;</code>: returns true if the left operand is strictly smaller than the
+                            right, false otherwise.</li>
+                            <li><code>&lt;=</code>: returns true if the left operand is smaller than or equal to the
+                            right.</li>
+                            <li><code>&gt;</code>: returns true if the left operand is strictly greater than the
+                            right.</li>
+                            <li><code>&gt;=</code>: returns true if the left operand is greater than or equal to the
+                            right.</li>
+                            <li><code>==</code>: returns true only if both operands are equal.</li>
+                            <li><code>!=</code>: returns true if the left and right operands are not equal.</li>
+                        </ul>
+                        And yes, I know about inequations but I didn't wanna make a separate category for just two
+                        operators. And lastly, there are boolean operators, which operate only on... booleans. Suprise.
+                        <ul>
+                            <li><code>&&</code>: returns true if both operands are true, false otherwise.</li>
+                            <li><code>||</code>: returns true if at least one of the operands is true.</li>
+                            <li><code>!</code>: negates a boolean expression.</li>
+                        </ul>
+                    </p>
+                    <p>
+                        A concept related to this (that you can totally skip if you want to) is short-circuit
+                        evaluation. Sometimes confused with lazy evaluation, they're not equal and more languages use
+                        short-circuit evaluation than lazy evaluation. Basically, short-circuit evaluation allows for a
+                        faster evaluation of <code>||</code> and <code>&&</code> operations by analyzing the first
+                        operand. If it's enough to determine the result, only the first operand is evaluated. Otherwise,
+                        both are. It'll probably be clearer with an example. Consider this bit of code: <code>bool
+                        result = something && expensive_call();</code><br>
+                        If <code>something</code> is equal to <code>true</code>, <code>expensive_call()</code> will
+                        determine the value of <code>result</code>. If <code>expensive_call()</code> evaluates to
+                        <code>true</code>, then <code>result</code> will be equal to <code>true</code> as well.
+                        Otherwise, it'll be equal to <code>false.</code><br>
+                        Now, if <code>something</code> is equal to false, <code>result</code> will be equal to
+                        <code>false</code> anyway, because both operands need to evaluate to <code>true</code> for
+                        <code>something</code> to be <code>true</code> as well. So C++ will just be lazy as hell (which
+                        <i>doesn't</i> mean this is lazy evaluation) and won't call <code>expensive_call()</code>, which
+                        can make our program run faster. Thank you, C++!
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">bool lt = 3 &lt; 3; // lt = false
+bool lteq = 3 &lt;= 3; // lteq = true
+bool gt = 5 &gt; 0; // gt = true
+bool gteq = 5 &gt;= 0; // gteq = true
+bool eq = 102 == 101; // eq = false
+bool noteq = 102 != 101; // noteq = true
+
+bool bool_and = 3 &lt; 4 && 3 &gt;= 3; // bool_and = true && true = true
+bool bool_or = 2 &lt; 4 || 2 &gt; 4; // bool_or = true || false = true
+bool bool_not0 = !bool_or; // bool_not0 = false;
+bool bool_not1 = !(true && false || 1 &lt;= 1); // bool_not1 = !(false || true) = !true = false
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>#include and using directives</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        In C++ (as in many other languages), not everything is included in the language itself. Some
+                        functions (like sine, square root, etc.) and concepts (constants like pi and objects like
+                        dynamic arrays) are contained in other files, in this case: the headers. I mean, technically not
+                        but that lie will do for now.
+                    </p>
+                    <p>
+                        To know which header you have to include to get what you want, you'll have to make an absolutely
+                        colossal effort: do some research on the internet. Some are very common though, such as
+                        <code>&lt;cmath&gt;</code>, <code>&lt;string&gt;</code>, <code>&lt;array&gt;</code>,
+                        <code>&lt;vector&gt;</code>, <code>&lt;iostream&gt;</code>, <code>&lt;fstream&gt;</code>, and
+                        sometimes <code>&lt;chrono&gt;</code>. Including headers is very easy, you just have to go athe
+                        very top of your file (yes, <u>above</u> the main function), and write <code>#include
+                        &lt;header&gt;</code>.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int main()
+{
+    //code
+}
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        I already covered this in the bad practices section but it's really important so I'll repeat it
+                        again. Don't <i>ever</i> use <code>using namespace std;</code> This tells the compiler "hey, you
+                        see that group of functions and classes and constants, of which I'll only use two? Yeah, give
+                        them to me. All of them, yes." Which is useless. Do you need <code>cout</code> once or twice?
+                        Write <code>std::cout</code>. Don't be lazy for five characters. Do you need to use cout a
+                        hundred times? Write <code>using std::cout;</code> right after the last <code>#include</code>
+                        directive and <i>before</i> the main function. Although, if you need it a hundred times in only
+                        one function, you can write it inside that function instead.
+                    </p>
+                    <p>
+                        Just to be sure that you understand the concept, and because you might not understand what
+                        namespaces are, I'll make a little analogy. Namespaces are toolboxes. <code>std</code> is a
+                        toolbox called "std", which is "standard" but with less letters. You'll know why later. In this
+                        toolbox, there are <b>a fuckton</b> of tools. Let's say you need a screwdriver and a hammer.
+                        Writing <code>using namespace std;</code>, especially at the top of your file, would be the
+                        equivalent of emptying <b>the entire</b> toolbox next to you. Writing <code>using
+                        std::cout;</code> at the top of your file would be the equivalent of getting that screwdriver
+                        out of the toolbox and leaving it next to you for when you need it. Writing it inside a function
+                        would be the equivalent of getting it out of it <i>only</i> when you need it. If you keep that
+                        in mind, it should be easier to know how and where to use using directives.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+// don't even think about using namespace std...
+using std::cout;
+
+int main()
+{
+    std::string s = "Hello, friend...";
+
+    cout << s + "\n";
+    cout << "This ";
+    cout << "is ";
+    cout << "stupid.\n";
+}
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Standard input and output</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Let's say we want to display some text in the terminal when someone executes our program.
+                        There's a header for that: <code>&lt;iostream&gt;</code> (input/output stream; dont' worry about
+                        what a stream is, we'll see that later). It gives us
+                        <code>std::cout</code> and <code>std::cin</code> to respectively write in the terminal and get
+                        user input form the terminal. The syntax might seem a bit weird (I mean, we're using the bit
+                        shift operators here...) but it'll make sense once we talk about function overloading. For now,
+                        just learn it by heart and don't question reality. You're not in the matrix...
+                    </p>
+                    <p>
+                        Starting with <code>std::cout</code>, called standard output, this allows you to write to the
+                        terminal pretty easily. The basic syntax is this: <code>std::cout << argument_zero
+                        << argument_one << ...;</code><br>
+                        This lets you easily write variables and primitive types to the standard output (see the example
+                        on the right).
+                    </p>
+                    <p>
+                        Now, what if we want the user to say something? That's when we use <code>std::cin</code>, or the
+                        standard input. This works just like <code>std::cout</code>, except that the operator points the
+                        other way (logically; think of it like a funnel): <code>std::cin >> variable;</code><br>
+                        There are one or two things to know about <code>std::cin</code> though. First, there always is a
+                        line break after the user input. Second, the operator stops reading as soon as it detects a
+                        <u>whitespace</u>; this means a line break as well as a tabulation or space. The way around this
+                        is to use <code>std::getline(std::cin, variable);</code> instead. Although this will only read
+                        one line, as the name suggests. And third, if you expect a number from the user, you can use the
+                        appropriate variable type and the operator will convert it. That is unless you have to take into
+                        account that you're not the only one to use your program. If other people that aren't
+                        programmers use your program, expect to have strings given as numbers, which will crash your
+                        program. The solution is to collect the input in a string and check for the input before
+                        converting it to a number and letting your program use it.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+using std::cin;
+using std::cout;
+
+int main()
+{
+    cout << "Hi mom!\n";
+    std::string name;
+    cout << "What's your age"
+
+    return 0;
+}
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Functions</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Now we're getting into the real basis of programming: dividing the code in functions! It's very
+                        simple though. For now... Think of them like mathematical function, because they work just the
+                        same, although programming languages extend the concept quite a bit further.
+                    </p>
+                    <p>
+                        Let's consider a simple function: f(x) = 2 * x, also written y = 2 * x.<br>
+                        Now, let's say you want to see what happens when x = 0, which also happens to be where y = 0.
+                        You're gonna write y<sub>0</sub> = f(0). Good. On the right, that's how we write it in C++.
+                    </p>
+                    <p>
+                        If you squint your eyes a bunch (a <i>good</i> bunch), it's exactly the same! Let's dissect
+                        what's going on.<br>
+                        The first line is simple. If you remember how you can declare variables, that's exactly what's
+                        happening here but with a function instead. The first word indicates what the function gives
+                        back, in this case: a floating point number. I chose <code>double</code> instead of
+                        <code>float</code> because it's more precise but both work. Integer types also work
+                        (technically) but it's pretty embarassing to have that function return 2 when you multiply 1.2
+                        by 2... Then, <code>f</code> is the name of the function. And in between parenthesis is the type of
+                        data that it accepts, in this case it's <code>double</code> because I wanted to. We call them
+                        parameters. And the thing you give to the function is called an argument. For example, here
+                        <code>x</code> is a parameter and 0 is an argument. And we're done with the function
+                        <u>declaration</u>.
+                    </p>
+                    <p>
+                        The second line is just the entry point of your program, you should know this by now. The third
+                        one is pretty explicit in my opinion, especially when keeping in mind the mathematical way of
+                        writing this.
+                    </p>
+                    <p>
+                        The last lines are the <u>definition</u> of the function. For a variable, we called it
+                        "initialization". Basically, we tell C++ what's the name of the function we're defining and then
+                        what it's gonna do. In our case, it (quite literally) returns x multiplied by two.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">double f(double);
+    
+int main()
+{
+    double y0 = f(0);
+}
+
+double f(double x)
+{
+    return 2 * x;
+}
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        There are a few caveats though. Declarations are facultative. Just like variables, you can
+                        either declare and then define a function, or do both at the same time. If you do both at the
+                        same time, it's just like the example but without the first line. But, it won't work because the
+                        function will be called before it's declared, before C++ knows that it exists. If you don't like
+                        that, go cry in a corner and switch to JavaScript. Then cry more because it's way more chaotic
+                        and come back to C++ and agree to get ****** with some lubricant, unlike in JS.<br>
+                        Personally, I like declaring the functions at the top and putting them wherever I want. It also
+                        prevents me from accidentally putting one a little too deep down and spending ten minutes
+                        searching for my stupid mistake. It also allows me to tidy up my code how I want and put them in
+                        an order that makes sense. But technically, you can do whatever you want.
+                    </p>
+                    <p>
+                        Two (or more) functions <i>can</i> have the same name but I advise against doing that
+                        <i>now</i>. It'll be useful in the future though.
+                    </p>
+                    <p>
+                        Functions can have multiple arguments, just like in mathematics. You can obviously create a
+                        function g(x, y) = x<sup>2</sup> + y<sup>2</sup>, which you'd write as is written on the right.
+                        You can also obviously use other types of data than numbers.
+                    </p>
+                    <p>
+                        As you also might have seen, the name of the parameters can be different in the function
+                        declaration and definition. We'll see later when this can be useful. For now, you should stick
+                        to giving a name to the parameters in the declaration and keeping the same names in the
+                        definition.
+                    </p>
+                    <p>
+                        Another thing. If your function has no parameters, don't forget to still put the parenthesis
+                        (with nothing in them). Otherwise, it might work but won't do what you want. For example,
+                        <code>std::cout << function << std::endl;</code> will compile but it will display
+                        the pointer to that function instead of your result. Don't know what a pointer is? Then be sure
+                        not to ask for one. Also, you'll see later what a pointer is.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">#include &lt;string&gt;
+std::string g(double x, double multiplier);
+
+// same example but declaring and defining at the same time
+double f(double x)
+{
+    return 2 * x;
+}
+
+int main()
+{
+    double y0 = f(0);
+    std::string s = g(y0, 1.125);
+}
+
+std::string g(double x, double y)
+{
+    return std::to_string(x * y); // this converts primitive types to string
+}
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        A peculiar fact about functions is that just as they can return something, they can also
+                        return... nothing. For example, if you make a function that just writes something to the
+                        standard output, it doesn't really need to return anything. So, if you need such a function, the
+                        type that represents nothing is <code>void</code>. The only thing special about it, is that you
+                        can't use it elsewhere. You can't declare a variable as <code>void</code> (what would that even
+                        mean?), can't take <code>void</code> as a parameter... Yeah, not incredibly useful, except when
+                        you need it. And when you call it, just don't assign the "result" to a variable.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">void doSomething();
+
+int main()
+{
+    doSomething();
+}
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Blocks: if-else, while/do-while and for</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Normally, a program executes from the first line to the last line (breaking it up into functions
+                        doesn't count because the functions are still executed in order). So-called blocks interrupt
+                        this top-to-bottom flow. If-else statements (also called conditionals) conditionally execute
+                        a set of instructions. For and while/do-while statements (also called loops) loop through a
+                        portion of the code multiple times. Blocks all have the same "architecture", examplified on the
+                        right. If you noticed that it looks almost like a function definition, you're totally right. An
+                        interesting fact about this is that you can absolutely put blocks into other blocks (which is
+                        called <b>nesting</b>). For example, you can nest an if statement inside an if statement, you
+                        can nest a for in a for, an if in a for, two if's in a for... Whatever you might need. If you're
+                        wondering, yes, you can create function inside function but not how you think and they're
+                        actually called lambda expressions. Maybe you'll see that later.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">block_name(conditions)
+{
+    // code
+}
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Starting with if statements. The general syntax is written on the right. This executes the
+                        instructions between curly brackets <u>if the condition evaluates to <code>true</code></u>,
+                        which totally means that it accepts any boolean variable.
+                    </p>
+                    <p>
+                        Every <code>else if</code> and <code>else</code> are facultative when writing an if statement.
+                        Obviously, the else statement always goes after all the other conditionals. Nested if statements
+                        are allowed but in a lot of cases, you can avoid going a level deeper. For example, if you are
+                        testing if the same variable is both greater than zero and smaller than another value, just
+                        write it as such as the condition: <code>if(variable &gt; 0 && variable &lt; value)</code><br>
+                        A rule you can apply is <b>if the outer if statement only contains the inner if statement, they
+                        can be collapsed into a single if statement</b>. This works every time. Unless it makes a huge,
+                        unreadable mess. Then it doesn't.
+                    </p>
+                    <p>
+                        Also, there might be a case where you're in a function that returns void (or in
+                        <code>main()</code>), and where if [some condition], the function does a lot of work, and
+                        otherwise it does almost nothing. In that case, just negate the condition in your if statement,
+                        put the small part in it, and at the end of that block, write <code>return;</code> (or
+                        <code>return 0;</code> if you're in <code>main()</code>), and write the big section <b>out of
+                        the if statement</b>. It's usually cleaner and easier to read.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">if(condition0)
+{
+    // code
+}
+else if(condition1)
+{
+    // code
+}
+...
+else if(conditionx)
+{
+    // code
+}
+else
+{
+    // code
+}
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container v-center">
+                <article class="flex-article">
+                    <p>
+                        Starting with if statements. The general syntax is written on the right. Sorry for that
+                        low-effort pun. Loops! In particular while and do-while loops. Examples are on the right, as
+                        always. The only differences are that in the do-while statement, the code inside it is executed
+                        at least once, even if the condition to stay in the loop doesn't evaluate to true, and that
+                        there is a semicolon after the while. Doesn't seem like much but it's easy to make mistakes. But
+                        in any case, the code in this block will be exectuted how many times it takes for the condition
+                        to evaluate to true, even if it means an infinite amount of times.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">while(condition)
+{
+    // code
+}
+
+do
+{
+    // code
+} while(condition);
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Now, we're having a look at the weird kid in the class. That's me by the way. And also the for
+                        loop. For loops are designed for specific cases. While loops are useful when you don't really
+                        know when it will end, like in the main loop of a game where you know that it ends when the user
+                        clicks on the red cross (or is told to <kbd>ALT+F4</kbd> for diamonds) but you don't know when
+                        he'll do it. Conversely, for loops are designed when you know exactly how many times it loops.
+                    </p>
+                    <p>
+                        Usually, for loops look how it's written on the right. But truly, you can make it behave just
+                        like a while loop by omitting both the initalization and the update but keeping the semicolon,
+                        like this: <code>for(;condition;)</code> or even make it infinite, like this:
+                        <code>for(;;)</code>.<br>
+                        But I advise against using it to avoid the pain coming from people because "you're a bad
+                        programmer" and from your future self because "I'm a bad programmer" and because you thought you
+                        could handle the pressure of being a bad programmer.
+                    </p>
+                    <p>
+                        In for loops, the initialization is executed once before the loop starts, condition is evaluated
+                        at each iteration until it evaluates to false (then it exits the loop), and update is run at
+                        each iteration as well. In a typical case, it looks like this: <code>for(int i = 0; i &lt; 69;
+                        ++i)</code><br>
+                        These types of loops are commonly used with arrays and vectors (they are some sort of lists), or
+                        anything that you can <i>iterate</i> through. Although, more often than not, you just need the
+                        item and not its index, and for loops allow you to do that in a <i>very</i> clean way. You'll
+                        see that in time.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">for(initialization; condition; update)
+{
+    // code
+}
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Now is the time to fuck with your brain a little. Maybe. I hope you remember the increment and
+                        decrement operators because this was just the tip of the iceberg. What's at the heart of it all
+                        is this baby right here: x = x + 1. Isn't that beautiful? No! It's complete mindfuck! What is it
+                        even supposed to mean? Ah, young Padawan, coding here we are, mathematics we are not doing! I
+                        never watched Star Wars, by the way. Maybe it looks complicated but it really isn't. In
+                        math, you'd assign the value of x + 1 to a new variable, maybe x<sub>1</sub> or something. But
+                        in programming, we don't want to use more variables than necessary because we're lazy fucks. So
+                        we gently (usually) ask C++ to add 1 to x and put the result back in the place it came from: x.
+                        Take x, add 1, store that in x.
+                    </p>
+                    <p>
+                        Now, there are a few ways to write increments by one. They'll be written in the first function
+                        on the right. Whichever one you choose, the compiler will probably optimize it and replace it
+                        with <code>++n</code>, unless you already use that of course. Same thing goes for
+                        <code>--n</code>, except this one subtracts one (drecrements) instead of incrementing it. As a
+                        rule of thumb, I'd always use <code>++n</code> unless I have to increment it by another amount;
+                        then I use <code>n += amount</code> unless I have to multiply or divide n; then I use <code>n =
+                        multiplier * n + amount</code>. Same goes for decrements.
+                    </p>
+                    <p>
+                        What if I want to multiply and divide instead of adding and subtracting though? You cry. Just
+                        kidding, there are equivalent <u>syntactic sugars</u>. Because yes, the compiler doesn't care
+                        about <code>n += amount</code> and will replace it with the last option. Both ways of writing
+                        other operations are in the second function.<br>
+                        However, there is one operator that doesn't have the syntactic-sugar form: the bitwise not
+                        (<code>~</code>).
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">void f0()
+{
+    int n = 0;
+    ++n;
+    n++;
+    n += 1;
+    n = n + 1;
+}
+void f1()
+{
+    int n = 2;
+    n *= 12;
+    n /= 3;
+    n %= 5;
+    n &= 0b10;
+    n |= 0b1001;
+    n ^= 0b1101;
+}
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Arrays</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Storing one element can be enough but sometimes, it won't be enough. For example, in a grid game
+                        where you have to memorize the state of each cell... Piece of cake for a 2x2 grid, very annoying
+                        for a 5x5, your worst mistake for 10x10 and impossible for 20x20 and over. Connect 4 is 7x6,
+                        chess is 8x8, Sea Battle is 9x9 to 11x11, the Game Of Life is usually at least 30x30 and can be
+                        as large as 256x256 or more... I hope you see the problem.
+                    </p>
+                    <p>
+                        So what we're gonna do, is store each cell in a <u>list</u>. Also called <u>array</u> when
+                        you're programming. Or sometimes <u>vector</u> in C++. Or <u>collection</u> for a more general
+                        approach. Or also <u>set</u>. Or about a dozen other technical words like <u>hash list</u>,
+                        <u>linked list</u>, <u>doubly linked list</u>. Or <u>tree</u> if you like gardening. Anyway, for
+                        now we'll take a look at C-style arrays, even though you absolutely should avoid them whenever
+                        you can but just in case, you should know how they work. It's also very important to know how
+                        C++ arrays and vectors work.
+                    </p>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        C-style arrays are declared and initialized just like variables but with a little twist, as you
+                        can see on the right. The syntax is pretty simple, to be honest: if you only declare an array,
+                        you have to put its size in brackets, otherwise it's optional; the size can be bigger than the
+                        number of elements it contains, but not the other way around. You can access elements by putting
+                        its position in the array. Careful: <b>arrays start at 0</b>. You're a psychopath if you start
+                        at 1. Yes, Lua programmers are all psychopaths. So if you want to have 3.14159, which is the
+                        first element in <code>constants</code>, you should write <code>constants[0]</code> and
+                        <u>not</u> <code>constants[1]</code>. You'll memorize it eventually when you get to your 10th
+                        segmentation fault and have to google it again...
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">int c_array[10];
+double constants[4] = {3.14159, 2.718281828, 0.0072973525};
+std::string shopping_cart_items[4] = {"eggs", "bottle of vodka", "milk"};
+// int wrong[];
+// int wrong_too[1] = {1, 2};
+
+double fine_structure_constant = constants[2];
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>The inner workings of the working memory</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Let's take a break with all the code and push your mind a bit more to its limits. Working
+                        memory, or RAM, is where all the code is stored when your program runs. This is because the
+                        processor needs to access data extremely fast, and a hard drive just doesn't cut it. We're
+                        talking at least one thousand (1000) times too slow. If you have a very good SSD, against normal
+                        RAM. Yeah... Worse than that, RAM guarantees that speed for anything: that's random-access
+                        memory.
+                    </p>
+                    <p>
+                        But anyway. Each time you initialize a variable, your computer allocates space for it. Depending
+                        on the type, it'll have to allocate more or less memory. On the right is a table with all the
+                        corresponding sizes, in bits. Whether they are signed or unsigned doesn't change anything. Now,
+                        for your computer to know where each variable is stored, it needs its address, also called
+                        reference. You'll see more of this later. So each variable has an address <i>pointing</i> to its
+                        content. The address is just an unsigned number 32- or 64-bit long (usually), depending on your
+                        system. Those addresses aren't random but if you choose to fiddle with them and start making
+                        operations on them (which you totally can, they're numbers), just don't do it outside of testing
+                        purposes.
+                    </p>
+                </article>
+                <article class="flex-article">
+                    <div class="flex-table">
+                        <div class="flex-row">
+                            <div class="flex-cell"><b>Type</b></div>
+                            <div class="flex-cell"><code>bool</code></div>
+                            <div class="flex-cell"><code>char</code></div>
+                            <div class="flex-cell"><code>short</code></div>
+                            <div class="flex-cell"><code>int</code></div>
+                            <div class="flex-cell"><code>long</code></div>
+                            <div class="flex-cell"><code>long long</code></div>
+                            <div class="flex-cell"><code>float</code></div>
+                            <div class="flex-cell"><code>double</code></div>
+                        </div>
+                        <div class="flex-row">
+                            <div class="flex-cell"><b>Size (bits)</b></div>
+                            <div class="flex-cell">1</div>
+                            <div class="flex-cell">8</div>
+                            <div class="flex-cell">16</div>
+                            <div class="flex-cell">32</div>
+                            <div class="flex-cell">32</div>
+                            <div class="flex-cell">64</div>
+                            <div class="flex-cell">32</div>
+                            <div class="flex-cell">64</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Pointers and references</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                       So, how do we use memory addresses in C++? We don't. For the love of all that is unholy, don't
+                       even think once about using that unless you really have to. And don't ever use raw pointers
+                       unless you're dealing with C-style strings. But what are pointers? It's just a variable that
+                       holds a reference to some data. The reference <i>is</i> the address, the pointer is just the
+                       thing that stores the reference. On the right, you can see how you can declare and initialize a
+                       pointer. If you plan on just <i>declaring</i> a pointer though, assigning it the
+                       <code>nullptr</code> value is a better practice <i>apparently</i>. The <code>&</code> operator is
+                       used to get the pointer to the variable next to it. And here, the <code>*</code> operator is used
+                       to indicate that the declared variable is a pointer.
+                    </p>
+                    <p>
+                        The second to last line might be a bit confusing but it's actually not that difficult. A pointer
+                        points to something. Whatever it is. So why not have a pointer that points to a pointer? I don't
+                        know of any use to it though. And if you wanted, you could even make a pointer to a pointer to a
+                        pointer; the compiler would obendiently do what his master said...
+                    </p>
+                    <p>
+                        Now, let's say you want to get the data that a pointer points to. You just have to put a
+                        <code>*</code> before the variable and it'll work like a charm; this is called
+                        <u>dereferencing</u>. 
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">int *decl_ptr; // declaration of a raw pointer
+int *null_ptr = nullptr; // initialization to nullptr
+
+int number = 20;
+int *ptr0 = &number; // "normal" initialization
+
+int **ptr1 = &ptr0; // ???
+
+int data = *ptr0; // dereferencing
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Arrays: the pointy counterattack</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        "But then... Why does VS Code (or whatever) tell me that my string is a <code>char
+                        *</code>/<code>char[]</code>?" Because it wants to, that's why! Now shut up. I'll tell you a
+                        story. Once upon a time, there was C. The end. Just kidding, plot twist, C's still there! And
+                        C++ was supposed to be a superset of C (which means that any line in C was valid in C++) but now
+                        it's not. But backwards compatibility exists. So C-style strings still exist in C++. Avoid them
+                        when you can, although you don't have to convert each and every <u>string literal</u> (which
+                        means any string that's in the program without using a variable) you give to
+                        <code>std::cout</code>. But still, use <code>std::string</code>. C++ strings uses C-style
+                        strings under the hood in any case, if you like them so much...
+                    </p>
+                    <p>
+                        So what's the deal with C-style strings anyway? Well, there's a reason why they're
+                        <code>char[]</code>, or quite literally character arrays. Because it's exactly what they are, a
+                        list of characters. Which makes sense. But what about <code>char *</code>? What the...? Yeah,
+                        it's about time to make your brain melt a little more.
+                    </p>
+                    <p>
+                        Arrays are actually pointers... in a way that's intentionally hidden to you. But they're right
+                        there, under the hood. When you initialize a C-style array, the variable is actually the pointer
+                        to the first element of the array. The code on the right prints <code>true</code>, for example.
+                        Which also means that you can perform <u>pointer arithmetic</u> but I advise you don't ever do
+                        that. Ever. But as an example, the third line prints true as well.
+                    </p>
+                    <p>
+                        If you look closely though, you can easily see why arrays start at 0. The number you put in
+                        brackets is actually the <i>offset</i> relative to the first element. So obviously, if you want
+                        the first element, you're not gonna add anything to the pointer to the first element...
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">int test[] = {1, 2, 3};
+
+// std::boolalpha is used to print booleans as true/false instead of 0/1
+std::cout << std::boolalpha << (test == &test[0]) << "\n";
+
+std::cout << std::boolalpha << (test[2] == *(test + 2)) << "\n";
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Making constants... actually constant</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                       If you ever did something like a program that computes the perimeter and area of a circle based
+                       on its radius (which you totally should do if you haven't), you might have put pi in a double.
+                       Well done but that's not enough. The problem, or rather the amazing thing about pi is that it's
+                       constant. So better tell the compiler that it is right? That's what you can do with the keyword
+                       <code>const</code>, example on the right. Careful though, you can't declare a constant, you have
+                       to initialize it right away. Yes, it's that simple. I'm serious, it's simple as hell. If that
+                       third line seems complicated, it isn't. <code>unsigned long long</code> makes using huge number
+                       possible and <code>std::ULLONG_MAX</code> is the maximal value it can take. Tell her to do some
+                       exercises though... See? It's simple! Simplest ever in C++! I swear. Don't believe me? Okay then,
+                       I'll make it complicated...
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">const double fine_struct_cst = 0.0072973525;
+const std::string hello = "Hello...";
+const unsigned long long your_moms_weight_in_solar_masses = std::ULLONG_MAX;
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Let's see. How about bringing in pointers? Yeah, let's look at what's on the right. And just to
+                        make it even harder, I'll always initialize to 0 since that's what <code>nullptr</code> means
+                        anyway. First line, you should understand, <code>cst0</code> is a constant integer. Second line,
+                        <code>cst1</code> is a pointer to a constant integer. Until now, all good. Third line. "It's a
+                        uh... constant pointer... to an integer...?" No, you moron! It's still a pointer to a constant
+                        integer. My bad though, would've been clearer if I put the star closer to <code>cst1</code>.
+                        Doesn't change a thing for the compiler though. By the way, although they're totally equivalent,
+                        the first line is how you should write a pointer to a constant integer. It's more readable.
+                    </p>
+                    <p>
+                        Fourth line. "It's a... constant pointer to an integer this time?" Obviously not! Just kidding,
+                        yes it is. Fifth line! "Uhhh..." One of the <code>const</code> is actually redundant. So it's a
+                        pointer to a constant integer. Sixth line? "I... What?" Yeah, exactly. I love this one, it's
+                        pretty funny. It's a constant pointer to a constant int. You can rewrite it with more space like
+                        line 7 or more clearly like line 8.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">const int cst0 = 0;
+const int *cst1 = 0;
+int const* cst2 = 0;
+
+int *const cst3 = 0;
+const int const *cst4 = 0;
+int const*const cst5 = 0;
+int const * const cst6 = 0;
+const int * const cst7 = 0;
+</code></pre>
+                </article>
+            </div>
+        </section>
+    </body>
+</html>
