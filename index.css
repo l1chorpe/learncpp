@@ -20,7 +20,7 @@ html, body
     width: 100vw;
 }
 
-pre > code
+code
 {
     font-family: FiraCode;
     font-size: small;
