@@ -880,12 +880,15 @@ void f1()
                         C-style arrays are declared and initialized just like variables but with a little twist, as you
                         can see on the right. The syntax is pretty simple, to be honest: if you only declare an array,
                         you have to put its size in brackets, otherwise it's optional; the size can be bigger than the
-                        number of elements it contains, but not the other way around. You can access elements by putting
-                        its position in the array. Careful: <b>arrays start at 0</b>. You're a psychopath if you start
-                        at 1. Yes, Lua programmers are all psychopaths. So if you want to have 3.14159, which is the
-                        first element in <code>constants</code>, you should write <code>constants[0]</code> and
-                        <u>not</u> <code>constants[1]</code>. You'll memorize it eventually when you get to your 10th
-                        segmentation fault and have to google it again...
+                        number of elements it contains, but not the other way around. You can access elements by using
+                        their position in the array, and put elements in it by also using their position, that we call
+                        <u>index</u> by the way. Careful: <b>arrays start at 0</b>. You're a psychopath if you start at
+                        1. Yes, Lua programmers are all psychopaths. So if you want to have 3.14159, which is the first
+                        element in <code>constants</code>, you should write <code>constants[0]</code> and <u>not</u>
+                        <code>constants[1]</code>. You'll memorize it eventually when you get to your 10th segmentation
+                        fault and have to google it again... Oh and sorry but unless you know the size of a C-style
+                        array, there's no <i>intuitive</i> way of knowing it. Oh also, you can't return arrays in
+                        functions. They work as parameters but you can't return one...
                     </p>
                 </article>
                 <article class="flex-article">
@@ -895,7 +898,11 @@ std::string shopping_cart_items[4] = {"eggs", "bottle of vodka", "milk"};
 // int wrong[];
 // int wrong_too[1] = {1, 2};
 
-double fine_structure_constant = constants[2];
+double fine_structure_constant = constants[2]; // get an element
+constants[0] = 4; // put/replace an element inside the array
+
+// get the size of a C-style array
+int constants_array_size = sizeof(constants)/sizeof(constants[0]);
 </code></pre>
                 </article>
             </div>
@@ -1026,6 +1033,10 @@ int data = *ptr0; // dereferencing
                         brackets is actually the <i>offset</i> relative to the first element. So obviously, if you want
                         the first element, you're not gonna add anything to the pointer to the first element...
                     </p>
+                    <p>
+                        And remember how I told you that you couldn't return arrays? Well, actually you can. Just use a
+                        pointer as the return type and it's done.
+                    </p>
                 </article>
                 <article class="flex-article">
 <pre><code class="language-cpp">int test[] = {1, 2, 3};
@@ -1034,6 +1045,101 @@ int data = *ptr0; // dereferencing
 std::cout << std::boolalpha << (test == &test[0]) << "\n";
 
 std::cout << std::boolalpha << (test[2] == *(test + 2)) << "\n";
+
+// function that returns an array of integers
+int* ilovearrays();
+</code></pre>
+                </article>
+            </div>
+        </section>
+        <section>
+            <h2>Arrays: the only alternative</h2>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        So if C-style arrays are so bad, what's the C++ way of having lists? Well, it all stands in the
+                        difference between C and C++: objects. C++ is what we call an <u>object-oriented language</u>.
+                        You'll see later what objects actually are but one thing you should remember until then is that
+                        they're hardly replaceable once you start using them.
+                    </p>
+                    <p>
+                        If you need a <u>static array</u>, which means an array that has a fixed size, you should
+                        include <code>&lt;array&gt;</code> and use them like on the right. If you know how C-style
+                        arrays work, these work the same way, except for the initalization/declaration. Since you
+                        haven't seen objects yet, I suggest to learn the syntax by heart and not care about anything
+                        except that it does what it's supposed to do. Between <u>diamonds</u> (that's what we call
+                        them), you have to specify the type and the number of items that it can contain. By the way, now
+                        you don't have to always know its size wherever you are in the program, just when you create it.
+                        And you can totally return one with a function.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">std::array&lt;double, 3&gt; constants = {3.14159, 2.718281828, 0.0072973525};
+double fsc = a[2]; // fsc = 0.0072973525
+a[0] = 4;
+
+auto size = a.size(); // don't worry about auto, you can use int
+// but auto is better...
+</code></pre>
+                </article>
+            </div>
+            <div class="flex-container">
+                <article class="flex-article">
+                    <p>
+                        Now, this is all fun and games but lists with a <u>static</u> size is boring. We want dynamics!
+                        And that is possible thanks to <code>&lt;vector&gt;</code>! "What? But I want a list, not a
+                        vec&mdash;" I know what you want and I know what I say, so shut up and learn. A vector with
+                        scalar coordinates? I don't care. <i>My</i> vectors can have strings as coordinates! And there's
+                        no need to say how many items there are, just what type they are. But it works just like a
+                        regular array. There are a few more things you can do with them. Since it's dynamic, you might
+                        wanna add another item to the end of the list. You can do that with the <code>push_back()</code>
+                        function.
+                    </p>
+                    <p>
+                        For a full list of what more you can do with those, I recommend searching on the internet or
+                        visiting <a href="https://www.cplusplus.com/reference/vector/vector/">this webpage</a> if you're
+                        too lazy to do your own research. Just look at what's under "member functions". Oh and by thr
+                        way, when I say that vectors can accept anything, I really mean it. Which means that it can very
+                        much accept another vectors (and so can arrays and C-style arrays). We usually call them
+                        matrices, and you might use them quite a lot. Multidimensional arrays/vectors are very useful
+                        pretty much everywhere. Careful though, (0,1) would give the bottom left element in math but in
+                        C++, it's the top right one. Vectors are displayed horizontally. Also, given the dynamic nature
+                        of vectors, that also means you can do... pretty weird "matrices", like the last line on the
+                        right.
+                    </p>
+                    <p>
+                        Last but not least (actually, that's probably the most important), when you pass a vector/array
+                        as a parameter, C++ will actually make <i>a copy</i> of it and give that to the function. This
+                        generally isn't a problem but sometimes, you'll want to modify the vector/array in your
+                        function, but that won't happen. And sometimes, your vector/array is just stupidly big (consider
+                        a matrix containing the pixels of a 4K image...) and it will just be horrendous
+                        performance-wise. As a rule, always pass vectors/array <u>by reference</u>, as demonstrated on
+                        the right. It looks like you're giving it a pointer (which you sort of are) but that's not the
+                        case. So except for this little ampersand before the parameter name, you won't have to change
+                        anything in your code or mess with pointers. If you don't understand what I mean, just remember
+                        that putting the little squigly thing in front of a parameter name when declaring and defining a
+                        function makes C++ give the original vector/array to your function instead of a copy.
+                    </p>
+                </article>
+                <article class="flex-article">
+<pre><code class="language-cpp">std::array&lt;double&gt; constants = {3.14159, 2.718281828, 0.0072973525};
+std::array&lt;std::string&gt; groceries = {"bread", "fish", "fish", "fish"};
+auto size = groceries.size(); // size = 4
+groceries.push_back("fish");
+size = groceries.size(); // size = 5
+
+// 2-dimensional matrix
+std::vector&lt;std::vector&lt;double&gt;&gt; matrix2x2 = {
+    {.5, 2.1},
+    {3, .4}
+};
+std::vector&lt;std::vector&lt;int&gt;&gt; weirdmatrix = {
+    {1, 2},
+    {3},
+    {4, 9, 5};
+};
+
+void iModifyAVector(std::vector&lt;int&gt; &v); // this function gets v by reference
 </code></pre>
                 </article>
             </div>
@@ -1081,6 +1187,11 @@ const unsigned long long your_moms_weight_in_solar_masses = std::ULLONG_MAX;
                         pretty funny. It's a constant pointer to a constant int. You can rewrite it with more space like
                         line 7 or more clearly like line 8.
                     </p>
+                    <p>
+                        Oh and one last for the kicks: if you declare an array as constant, in Java you'd just be unable
+                        to assign another array to the variable. But in C++, you also can't modify any of the elements
+                        inside it.
+                    </p>
                 </article>
                 <article class="flex-article">
 <pre><code class="language-cpp">const int cst0 = 0;
@@ -1092,6 +1203,9 @@ const int const *cst4 = 0;
 int const*const cst5 = 0;
 int const * const cst6 = 0;
 const int * const cst7 = 0;
+
+std::vector&lt;int&gt; v = {1, 2, 3};
+// v[0] = 0; // illegal
 </code></pre>
                 </article>
             </div>
